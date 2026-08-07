@@ -80,9 +80,11 @@ function DashboardLayout({ children }) {
     <>
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="rounded-2xl bg-cyan-500/15 p-3 text-cyan-300 shadow-[0_0_25px_rgba(34,211,238,0.45)]">
-            <Sparkles size={23} />
-          </div>
+          <img
+  src="/logo.png"
+  alt="Cogniverse AI"
+  className="h-14 w-14 rounded-2xl object-contain"
+/>
 
           <div>
             <h1 className="text-xl font-black sm:text-2xl">
