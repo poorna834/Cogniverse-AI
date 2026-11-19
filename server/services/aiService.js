@@ -1,46 +1,116 @@
-// This file will later connect to OpenAI / Gemini.
-// For now it returns intelligent mock responses.
+const { GoogleGenAI } = require("@google/genai");
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 const generateAIResponse = async (question) => {
+  try {
+    const prompt = `
+You are Pixi AI, the friendly AI learning mentor inside Cogniverse AI.
+
+Your job is to help students learn technology, programming, computer science,
+AI, cybersecurity, careers, interview preparation, and related subjects.
+
+Give clear, practical and beginner-friendly answers.
+
+When explaining technical concepts:
+- Explain the concept simply first.
+- Give examples when useful.
+- Use bullet points when appropriate.
+- Give a practical next step for the learner.
+- Do not make the answer unnecessarily long.
+
+Student question:
+${question}
+`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.8-flash",
+      contents: prompt,
+      config: {
+        temperature: 0.7,
+        maxOutputTokens: 1000,
+      },
+    });
+
+    const answer = response.text?.trim();
+
+    if (!answer) {
+      throw new Error("Gemini returned an empty response.");
+    }
+
+    return {
+      answer,
+      category: detectCategory(question),
+    };
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+
+    throw new Error("Pixi AI could not generate a response.");
+  }
+};
+
+const detectCategory = (question) => {
   const text = question.toLowerCase();
 
-  if (text.includes("mern")) {
-    return {
-      answer:
-        "To become a MERN Stack Developer, start with HTML, CSS, JavaScript, then React, Node.js, Express.js, MongoDB, Git, REST APIs and finally build full-stack projects.",
-      category: "Web Development",
-    };
+  if (
+    text.includes("ai") ||
+    text.includes("machine learning") ||
+    text.includes("deep learning")
+  ) {
+    return "Artificial Intelligence";
   }
 
-  if (text.includes("python")) {
-    return {
-      answer:
-        "Start with Python basics, functions, OOP, file handling, then move to NumPy, Pandas, Matplotlib, Machine Learning and AI.",
-      category: "Programming",
-    };
+  if (
+    text.includes("react") ||
+    text.includes("javascript") ||
+    text.includes("node") ||
+    text.includes("express") ||
+    text.includes("mern") ||
+    text.includes("html") ||
+    text.includes("css")
+  ) {
+    return "Web Development";
   }
 
-  if (text.includes("ai")) {
-    return {
-      answer:
-        "Learn Python, Data Structures, Mathematics, Machine Learning, Deep Learning, NLP, Computer Vision and build AI projects.",
-      category: "Artificial Intelligence",
-    };
+  if (
+    text.includes("python") ||
+    text.includes("java") ||
+    text.includes("c++") ||
+    text.includes("programming") ||
+    text.includes("coding")
+  ) {
+    return "Programming";
   }
 
-  if (text.includes("interview")) {
-    return {
-      answer:
-        "Prepare your resume, revise core concepts, solve aptitude questions, practice communication and participate in mock interviews.",
-      category: "Career",
-    };
+  if (
+    text.includes("cybersecurity") ||
+    text.includes("security") ||
+    text.includes("hacking") ||
+    text.includes("burp")
+  ) {
+    return "Cybersecurity";
   }
 
-  return {
-    answer:
-      "That's an interesting question. Pixi AI will soon provide highly personalized answers using an advanced AI model. For now, continue learning consistently and build practical projects.",
-    category: "General",
-  };
+  if (
+    text.includes("interview") ||
+    text.includes("resume") ||
+    text.includes("career") ||
+    text.includes("job")
+  ) {
+    return "Career";
+  }
+
+  if (
+    text.includes("database") ||
+    text.includes("mongodb") ||
+    text.includes("sql")
+  ) {
+    return "Database";
+  }
+
+  return "General";
 };
 
 module.exports = {
